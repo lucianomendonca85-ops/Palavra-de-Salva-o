@@ -270,6 +270,8 @@ footer{padding-bottom:104px}
 #cxd .cxsb{padding-top:0}
 
 .cxtab{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}.cxtab .btn{flex:1 1 140px}
+
+.cxch{margin:14px 0;padding:12px;border-radius:12px;border:1px solid var(--ln);background:var(--bg)}.cxch select{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:12px 14px;border-radius:12px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);font:inherit}.cxcv{margin-top:14px}.cxcv canvas{width:100%;height:auto;border-radius:8px;border:1px solid var(--ln)}
 </style></head><body>
 <header><a class="br" href="#inicio"><img class="lg" alt=""><b>Palavra de Salvação</b></a>
 <nav><a href="#sobre">Sobre</a><a href="#enfases">Pontos</a><a href="#biblia">Bíblia</a><a href="#estudos">Estudos</a><a href="#teologia">Teologia</a><a href="#aprofundado">Aprofundados</a><a href="#quiz">Quiz</a><a href="#evangelismo">Evangelismo</a><a href="#culto">Culto</a><a href="#reflexoes">Reflexões</a><a href="#duvidas" onclick="dv();return false">Dúvidas</a></nav><button id="tm" onclick="tm()" aria-label="Alternar tema claro e escuro">◐</button></header>
@@ -706,6 +708,13 @@ function sync(st){
 }
 function dropLocal(){S.k().filter(k=>k.indexOf('cu|')===0).forEach(k=>S.s(k,''))}
 let em='new',busy=false;
+const CHN={youtube:['YouTube','https://www.youtube.com/@lucianomendonca2371?sub_confirmation=1'],instagram:['Instagram','https://www.instagram.com/pr_lucianomendonca_oficial'],tiktok:['TikTok','https://www.tiktok.com/@prlucianomendonca']};
+const mes=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const hoje=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dtx=v=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');return m?(+m[3])+' de '+mes[+m[2]-1]+' de '+m[1]:''};
+function canGo(){const sel=$('cxsel'),sub=$('cxsub'),ck=$('cxck'),go=$('cxgo');if(!go)return;go.disabled=!(sel&&sel.value&&sub&&sub.checked&&(em==='in'||(ck&&ck.checked)))}
+let cvOk=false;
+
 const best=i=>{const v=S.g('cu|m|'+CM[i].id);return v===''?-1:Math.max(0,Math.min(NQ,parseInt(v,10)||0))};
 const tries=i=>parseInt(S.g('cu|a|'+CM[i].id),10)||0;
 const ok=i=>best(i)>=PASS;
@@ -738,7 +747,7 @@ function renderCur(){
  }
  const d=done(),p=Math.round(d*100/N),nx=nxt();
  let h=`<div class="cxb"><div class="cxhd"><h3>🎓 Curso de Teologia</h3><small>Conta ativa${e.n?' · '+esc(e.n):''}</small></div>`;
- h+=d===N?`<p><b>🎉 Parabéns${e.n?', '+esc(e.n):''}! Você foi aprovado nos ${N} módulos do curso.</b></p>`:`<p>Faça os módulos em ordem. Para liberar o próximo, tire pelo menos <b>70%</b> na prova do módulo.</p>`;
+ h+=d===N?`<p><b>🎉 Parabéns${e.n?', '+esc(e.n):''}! Você foi aprovado nos ${N} módulos do curso.</b></p><p><button type="button" class="btn" data-a="cert">🏆 Emitir meu certificado</button></p>`:`<p>Faça os módulos em ordem. Para liberar o próximo, tire pelo menos <b>70%</b> na prova do módulo.</p>`;
  h+=`<div class="cxi"><span>Progresso no curso</span><span><b>${d} de ${N}</b> módulos aprovados · <b>${p}%</b></span></div>${bar(p,'Progresso no curso: módulos aprovados',d===N?'ok':'')}`;
  h+=`<ol class="cxg">${CM.map((m,i)=>card(m,i,nx)).join('')}</ol><div class="cxmsg" id="cxmsg" role="status" aria-live="polite">${esc(msg)}</div>`;
  h+=rst?`<div class="cxlv" role="group" aria-label="Confirmar reinício"><b>Sair da conta?</b><p>Seu progresso continua salvo na conta. Para voltar, entre com seu e-mail e senha.</p><div class="cxa"><button type="button" class="btn" data-a="rst-yes">Sim, sair</button><button type="button" class="btn o" data-a="rst-no">Cancelar</button></div></div>`:`<p class="cxrs"><button type="button" class="cxtl" data-a="rst">Sair da conta</button></p>`;
@@ -754,6 +763,7 @@ cur.addEventListener('click',e=>{
   msg='';openDlg('mod',i);return;
  }
  const a=t.dataset.a;
+ if(a==='cert'){if(done()===N)openDlg('cert');return}
  if(a==='rst'){rst=true;renderCur();return}
  if(a==='rst-no'){rst=false;renderCur();return}
  if(a==='rst-yes'){const t0=tok();dropLocal();rst=false;msg='';renderCur();if(t0)rpc('course_logout',{p_token:t0}).catch(()=>{})}
@@ -770,13 +780,43 @@ function vEnr(){const nw=em==='new';return `<p>O curso é <b>opcional</b> e grat
 <li>Você <b>não vê quais respostas estão certas</b>: a prova é corrigida no servidor e o resultado mostra a porcentagem.</li>
 <li>Você pode refazer a prova (com 45 segundos de intervalo). Vale o melhor resultado.</li>
 <li>Seu progresso fica salvo na sua conta e acompanha você em qualquer aparelho.</li></ul>
+<div class="cxch"><b>📣 Inscreva-se em um dos nossos canais</b><p>Para acessar o curso, inscreva-se (ou siga) em <b>pelo menos um</b> canal. É grátis e ajuda o ministério a continuar.</p><div class="cxfl">${Object.keys(CHN).map(k=>`<a class="cxl" href="${CHN[k][1]}" target="_blank" rel="noopener">${CHN[k][0]}</a>`).join('')}</div>
+<label class="cxnm">Canal em que me inscrevi<select id="cxsel"><option value="">Escolha o canal</option>${Object.keys(CHN).map(k=>`<option value="${k}">${CHN[k][0]}</option>`).join('')}</select></label>
+<label class="cxck"><input type="checkbox" id="cxsub"><span>Confirmo que me inscrevi/segui o canal escolhido.</span></label></div>
 <div class="cxtab" role="group" aria-label="Tipo de acesso"><button type="button" class="btn${nw?'':' o'}" data-a="em-new">Criar conta</button><button type="button" class="btn${nw?' o':''}" data-a="em-in">Já tenho conta</button></div>
 ${nw?'<label class="cxnm">Seu nome<input id="cxnm" maxlength="80" autocomplete="name" placeholder="Nome completo"></label>':''}
 <label class="cxnm">E-mail<input id="cxem" type="email" maxlength="120" autocomplete="email" placeholder="voce@exemplo.com"></label>
 <label class="cxnm">Senha${nw?' (6 a 72 caracteres)':''}<input id="cxpw" type="password" maxlength="72" autocomplete="${nw?'new-password':'current-password'}"></label>
 ${nw?'<label class="cxck"><input type="checkbox" id="cxck"><span>Confirmo que quero fazer o Curso de Teologia e conheço as regras acima.</span></label>':''}
 <div class="cxmsg" id="cxem-msg" role="alert" aria-live="assertive"></div>
-<div class="cxa"><button type="button" class="btn" id="cxgo"${nw?' disabled':''}>${nw?'🎓 Criar conta e iniciar':'🔓 Entrar'}</button><button type="button" class="btn o" data-a="back">Agora não</button></div>`}
+<div class="cxa"><button type="button" class="btn" id="cxgo" disabled>${nw?'🎓 Criar conta e iniciar':'🔓 Entrar'}</button><button type="button" class="btn o" data-a="back">Agora não</button></div>`}
+function vCert(){
+ const nm=S.g('cu|nm');
+ return `<p>Parabéns por concluir os ${N} módulos! Preencha os dados que devem aparecer no certificado.</p>
+<label class="cxnm">Nome completo<input id="cxcn" maxlength="80" autocomplete="name" value="${esc(nm)}"></label>
+<label class="cxnm">Data de conclusão<input id="cxcd" type="date" value="${hoje()}" max="${hoje()}"></label>
+<div class="cxmsg" id="cxcm" role="alert"></div>
+<div class="cxa"><button type="button" class="btn" data-a="cert-go">🏆 Gerar certificado</button><button type="button" class="btn o" data-a="back">Voltar</button></div>
+<div id="cxcv" class="cxcv" hidden></div>`}
+function drawCert(name,dt){
+ const W=1600,H=1130,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+ g.fillStyle='#fffaf0';g.fillRect(0,0,W,H);
+ g.strokeStyle='#b8862b';g.lineWidth=14;g.strokeRect(40,40,W-80,H-80);g.lineWidth=3;g.strokeRect(70,70,W-140,H-140);
+ g.textAlign='center';g.fillStyle='#3a2a10';
+ const fit=(t,max,fam,w,min)=>{let z=max;do{g.font=fam.replace('#',z);z-=2}while(g.measureText(t).width>w&&z>min)};
+ g.fillStyle='#b8862b';g.font='bold 34px Georgia,serif';g.fillText('CANAL PALAVRA DE SALVAÇÃO',W/2,200);
+ g.fillStyle='#3a2a10';g.font='bold 96px Georgia,serif';g.fillText('Certificado de Conclusão',W/2,330);
+ g.font='italic 34px Georgia,serif';g.fillText('Certificamos que',W/2,440);
+ g.fillStyle='#7a4e0a';fit(name,86,'italic bold #px Georgia,serif',1200,40);g.fillText(name,W/2,560);
+ g.strokeStyle='#b8862b';g.lineWidth=2;g.beginPath();g.moveTo(300,590);g.lineTo(W-300,590);g.stroke();
+ g.fillStyle='#3a2a10';g.font='34px Georgia,serif';
+ g.fillText('concluiu o Curso de Teologia, com aprovação nos '+N+' módulos,',W/2,680);
+ g.fillText('em '+dt+'.',W/2,735);
+ g.font='italic 28px Georgia,serif';g.fillStyle='#6b5a3a';g.fillText('“Lâmpada para os meus pés é a tua palavra.” (Salmos 119:105)',W/2,860);
+ g.font='22px Georgia,serif';g.fillText('Certificado de estudo livre do canal, sem validade acadêmica oficial.',W/2,985);
+ g.fillText('Palavra de Salvação · Pr. Luciano Mendonça',W/2,1022);
+ return c;
+}
 function vStudy(m){
  const s=m.s;if(!s)return `<p>${esc(m.d)}</p><h4>O que você vai estudar</h4><ul>${m.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
  const P=a=>a.map(x=>`<p>${esc(x)}</p>`).join('');
@@ -829,6 +869,7 @@ function vRes(){
   }
  }
  h+=`<div class="cxi"><span>Progresso no curso</span><span><b>${d} de ${N}</b> módulos aprovados · <b>${pp}%</b></span></div>${bar(pp,'Progresso no curso: módulos aprovados',d===N?'ok':'')}<div class="cxa">`;
+ if(okk&&d===N)h+=`<button type="button" class="btn" data-a="cert">🏆 Emitir certificado</button>`;
  if(okk&&!last)h+=`<button type="button" class="btn" data-a="mod" data-m="${vm+1}">Ir ao Módulo ${vm+2} →</button>`;
  if(!okk&&!kept)h+=`<button type="button" class="btn" data-a="exam">📝 Tentar de novo</button><button type="button" class="btn o" data-a="mod" data-m="${vm}">Reestudar o módulo</button>`;
  else if(kept)h+=`<button type="button" class="btn o" data-a="exam">Tentar de novo</button>${vm<N-1?`<button type="button" class="btn" data-a="mod" data-m="${vm+1}">Ir ao Módulo ${vm+2} →</button>`:''}`;
@@ -841,6 +882,7 @@ function render(keep){
  if(view==='enr'){t='Matrícula no Curso de Teologia';h=vEnr()}
  else if(view==='mod'){t=`Módulo ${vm+1} · ${CM[vm].t}`;h=vMod()}
  else if(view==='exam'){t=`Prova · Módulo ${vm+1}`;h=vExam()}
+ else if(view==='cert'){t='Certificado de conclusão';h=vCert()}
  else if(view==='res'){t=`Resultado · Módulo ${vm+1}`;h=vRes()}
  cdt.textContent=t;cdb.innerHTML=h;
  cdb.querySelectorAll('[data-w]').forEach(el=>{const w=el.dataset.w;requestAnimationFrame(()=>requestAnimationFrame(()=>{el.style.width=w+'%'}))});
@@ -877,16 +919,25 @@ cdb.addEventListener('click',e=>{
  if(t.id==='cxgo'){
   if(busy)return;
   const nw=em==='new',box=$('cxem-msg');
-  if(nw&&!$('cxck').checked)return;
+  canGo();if(t.disabled)return;
   const email=($('cxem').value||'').trim(),pw=$('cxpw').value||'',nm=nw?($('cxnm').value||'').trim():'';
   busy=true;t.disabled=true;box.textContent='Conectando...';
   (nw?rpc('course_signup',{p_name:nm,p_email:email,p_password:pw}):rpc('course_login',{p_email:email,p_password:pw})).then(r=>{
-   dropLocal();S.s('cu|tk',r.token);sync(r.state);msg='';busy=false;hide();cur.scrollIntoView({behavior:rm.matches?'auto':'smooth',block:'start'});
+   dropLocal();S.s('cu|tk',r.token);S.s('cu|ch',$('cxsel').value);sync(r.state);msg='';busy=false;hide();cur.scrollIntoView({behavior:rm.matches?'auto':'smooth',block:'start'});
   }).catch(e=>{busy=false;t.disabled=false;box.textContent=e.message});
   return;
  }
  const a=t.dataset.a;if(!a||t.disabled)return;
  if(a==='em-new'||a==='em-in'){em=a==='em-new'?'new':'in';render();return}
+ if(a==='cert'){if(done()===N)openDlg('cert');return}
+ if(a==='cert-go'){
+  const n=($('cxcn').value||'').trim(),d=$('cxcd').value,box=$('cxcm');
+  if(n.length<3){box.textContent='Digite seu nome completo (mínimo 3 letras).';return}
+  if(!dtx(d)){box.textContent='Escolha a data de conclusão.';return}
+  box.textContent='';const cv=drawCert(n,dtx(d)),w=$('cxcv');w.hidden=false;w.innerHTML='';cv.setAttribute('aria-label','Certificado de conclusão de '+n);w.appendChild(cv);
+  const bt=document.createElement('div');bt.className='cxa';bt.innerHTML='<button type="button" class="btn" data-a="cert-dl">⬇ Baixar imagem (PNG)</button><button type="button" class="btn o" data-a="cert-pr">🖨 Imprimir</button>';w.appendChild(bt);cvOk=true;w.scrollIntoView({block:'nearest'});return}
+ if(a==='cert-dl'){const cv=$('cxcv').querySelector('canvas');if(!cv)return;cv.toBlob(b=>{const u=URL.createObjectURL(b),l=document.createElement('a');l.href=u;l.download='certificado-curso-teologia.png';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)});return}
+ if(a==='cert-pr'){const cv=$('cxcv').querySelector('canvas');if(!cv)return;const w=window.open('','_blank');if(!w)return;w.document.write('<title>Certificado</title><style>@page{size:landscape;margin:0}body{margin:0}img{width:100%}</style><img src="'+cv.toDataURL('image/png')+'" onload="print()">');w.document.close();return}
  if(a==='back')hide();
  else if(a==='exam')startExam(vm);
  else if(a==='mod'){openDlg('mod',+t.dataset.m)}
@@ -899,7 +950,7 @@ cdb.addEventListener('click',e=>{
 });
 cdb.addEventListener('change',e=>{
  const t=e.target;
- if(t.id==='cxck'){$('cxgo').disabled=!t.checked;return}
+ if(t.id==='cxck'||t.id==='cxsub'||t.id==='cxsel'){canGo();return}
  if(t.name==='cxo'&&ex){
   ex.ans[ex.i]=+t.value;render(true);
   const c=cdb.querySelector('input[name=cxo]:checked');if(c)try{c.focus({preventScroll:true})}catch(x){}
